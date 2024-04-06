@@ -18,30 +18,38 @@ from time import sleep
 def odb_consumer():
     # Connect to MySQL database
     conn = None
-    queryP = "INSERT INTO Product(P_name,P_category,P_price) " \
+    queryP = "INSERT INTO Player(teamid,ht,wt) " \
             "VALUES(%s,%s,%s)"
-    queryC = "INSERT INTO Customer(C_name,C_address) " \
+    queryTe = "INSERT INTO Team(name,city) " \
             "VALUES(%s,%s)"
-    queryT = "INSERT INTO Transaction(Cid,Pid,amount,Total_sale) " \
-            "VALUES(%s,%s,%s,%s)"
+    queryW = "INSERT INTO Week(num,season,year) " \
+            "VALUES(%s,%s,%s)"
+    queryT = "INSERT INTO Transaction(pid,tid,opp_tid,wid,points) " \
+            "VALUES(%s,%s,%s,%s,%s)"
     
-    consumerP = KafkaConsumer('Product',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerC = KafkaConsumer('Customer',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumerP = KafkaConsumer('Player',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumerTe = KafkaConsumer('Team',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumerW = KafkaConsumer('Week',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
     consumerT = KafkaConsumer('Transaction',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
     producer = KafkaProducer(bootstrap_servers='10.0.0.42:29092')
-                             
-    #tuples = [('jones','loc1','prod1', 10),('smith','loc1','prod1', 20),('jones','loc1','prod1', 10)]  
     
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
     
     tuples = []
-    z = 0
+    transaction_done = False
 
     while True:
-        if z == 4:
-             break
+
+        if transaction_done is True:
+            transaction_done = False
+            m = 'odb update event'   
+            producer.send('odb-update-stream', m.encode())
+            print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
+            producer.flush()
+        
         messageP = consumerP.poll()
         messageP = next(iter(messageP.values()), None)
+
         if messageP is not None:
             messageP = messageP[0]
             in_string = messageP.value.decode()
@@ -50,10 +58,10 @@ def odb_consumer():
             
             sleep(1)
             
-            name = in_tuple[0]
-            category = in_tuple[1]
-            price = in_tuple[2]
-            tuples.append((name,category,price))
+            teamid = in_tuple[0]
+            ht = in_tuple[1]
+            wt = in_tuple[2]
+            tuples.append((teamid,ht,wt))
         
             try:  
                 conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
@@ -71,7 +79,7 @@ def odb_consumer():
                     
                 conn.commit()
                 
-                cursor.execute("SELECT count(*) FROM Product")
+                cursor.execute("SELECT count(*) FROM Player")
                 print(cursor.fetchall())
                 
                 sleep(2)
@@ -86,19 +94,21 @@ def odb_consumer():
             
             tuples.clear()
 ############################################################################################
-        messageC = consumerC.poll()
-        messageC = next(iter(messageC.values()), None)
-        if messageC is not None:
-            messageC = messageC[0]
-            in_string = messageC.value.decode()
+        messageW = consumerW.poll()
+        messageW = next(iter(messageW.values()), None)
+
+        if messageW is not None:
+            messageW = messageW[0]
+            in_string = messageW.value.decode()
             in_tuple = in_string.strip('"').split(',')
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
             sleep(1)
             
-            name = in_tuple[0]
-            address = in_tuple[1]
-            tuples.append((name,address))
+            num = in_tuple[0]
+            season = in_tuple[1]
+            year = in_tuple[2]
+            tuples.append((num,season,year))
         
             try:  
                 conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
@@ -112,11 +122,57 @@ def odb_consumer():
                 cursor = conn.cursor()
                 
                 for tuple in tuples:
-                    cursor.execute(queryC,tuple)
+                    cursor.execute(queryW,tuple)
                     
                 conn.commit()
                 
-                cursor.execute("SELECT count(*) FROM Customer")
+                cursor.execute("SELECT count(*) FROM Week")
+                print(cursor.fetchall())
+                
+                sleep(2)
+                    
+            except Error as e:
+                print(e)
+                
+            finally:
+                if conn is not None and conn.is_connected():
+                    cursor.close()
+                    conn.close()
+            
+            tuples.clear()
+############################################################################################
+        messageTe = consumerTe.poll()
+        messageTe = next(iter(messageTe.values()), None)
+
+        if messageTe is not None:
+            messageTe = messageTe[0]
+            in_string = messageTe.value.decode()
+            in_tuple = in_string.strip('"').split(',')
+            print ('\nInput Tuple Received: {}'.format(in_tuple))
+            
+            sleep(1)
+            
+            name = in_tuple[0]
+            city = in_tuple[1]
+            tuples.append((name,city))
+        
+            try:  
+                conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                                        port=13306, 
+                                        database = 'odb',
+                                        user='deuser',
+                                        password='depassword')
+                if conn.is_connected():
+                        print('\nConnected to destination ODB MySQL database')
+                
+                cursor = conn.cursor()
+                
+                for tuple in tuples:
+                    cursor.execute(queryTe,tuple)
+                    
+                conn.commit()
+                
+                cursor.execute("SELECT count(*) FROM Team")
                 print(cursor.fetchall())
                 
                 sleep(2)
@@ -133,6 +189,7 @@ def odb_consumer():
 ############################################################################################
         messageT = consumerT.poll()
         messageT = next(iter(messageT.values()), None)
+        
         if messageT is not None:
             print(consumerT.subscription())
             messageT = messageT[0]
@@ -145,11 +202,12 @@ def odb_consumer():
 
             sleep(1)
             
-            cid = in_tuple[0]
-            pid = in_tuple[1]
-            amount = in_tuple[2]
-            total = in_tuple[3]
-            tuples.append((cid,pid,amount,total))
+            pid = in_tuple[0]
+            tid = in_tuple[1]
+            opp_tid = in_tuple[2]
+            wid = in_tuple[3]
+            points = in_tuple[4]
+            tuples.append((pid,tid,opp_tid,wid,points))
         
             try:  
                 conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
@@ -171,8 +229,6 @@ def odb_consumer():
                 print(cursor.fetchall())
                 
                 sleep(2)
-                
-                z = z + 1
                     
             except Error as e:
                 print(e)
@@ -183,12 +239,6 @@ def odb_consumer():
                     conn.close()
 
             tuples.clear()
-    
-    m = 'odb update event'   
-    producer.send('odb-update-stream', m.encode())
-    print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
-    producer.flush()
-    odb_consumer()
             
 if __name__ == '__main__':
     odb_consumer()

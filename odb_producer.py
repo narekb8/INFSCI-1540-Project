@@ -15,7 +15,7 @@ from time import sleep
 def odb_producer():
     # Connect to MySQL database
     odb_conn = None
-    odb_aggregate_query = "SELECT Pid, SUM(Total_sale) "\
+    odb_aggregate_query = "SELECT pid, tid, opp_tid, wid, points "\
                           " FROM Transaction "\
                           " GROUP BY Pid"    
                           
@@ -23,9 +23,11 @@ def odb_producer():
     producer = KafkaProducer(bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
           
     print('\nWaiting for ODB UPDATE EVENT, Ctr/Z to stop ...')
+    
     while True:
         message = consumer.poll()
         message = next(iter(message.values()), None)
+
         if message is not None:
             print ('\nODB UPDATE EVENT RECEIVED FROM odb-update-stream')
             print ('Producing aggregated tuple for AggrData stream ...')
