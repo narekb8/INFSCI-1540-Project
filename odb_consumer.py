@@ -36,17 +36,8 @@ def odb_consumer():
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
     
     tuples = []
-    transaction_done = False
 
-    while True:
-
-        if transaction_done is True:
-            transaction_done = False
-            m = 'odb update event'   
-            producer.send('odb-update-stream', m.encode())
-            print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
-            producer.flush()
-        
+    while True:        
         messageP = consumerP.poll()
         messageP = next(iter(messageP.values()), None)
 
@@ -191,9 +182,15 @@ def odb_consumer():
         messageT = next(iter(messageT.values()), None)
         
         if messageT is not None:
-            print(consumerT.subscription())
             messageT = messageT[0]
             in_string = messageT.value.decode()
+
+            if 'data stream done' in in_string:
+                m = 'odb update complete'   
+                producer.send('fact-update-stream', m.encode())
+                print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
+                producer.flush()
+
             in_tuple = in_string.strip('"').split(',')
             if len(in_tuple) < 4:
                  continue
@@ -229,6 +226,11 @@ def odb_consumer():
                 print(cursor.fetchall())
                 
                 sleep(2)
+
+                m = 'odb update event'   
+                producer.send('fact-update-stream', m.encode())
+                print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
+                producer.flush()
                     
             except Error as e:
                 print(e)

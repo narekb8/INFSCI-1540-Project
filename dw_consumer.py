@@ -14,63 +14,162 @@ from kafka import KafkaConsumer
 def dw_consumer():
     # Connect to MySQL database
     dw_conn = None
-    dw_load_query = "INSERT INTO fact(product,sale) " \
+    dw_load_fact = "INSERT INTO fact(pid,tid,opp_tid,wid,points) " \
+                     "VALUES(%s,%s,%s,%s,%s)"
+    dw_load_lifetime = "INSERT INTO Lifetime(pid,points) " \
                      "VALUES(%s,%s)"
+    dw_load_vs = "INSERT INTO Vs(pid,opp_tid,points) " \
+                     "VALUES(%s,%s,%s)"
     
-    consumer = KafkaConsumer('AggrData',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    
+    
+    consumer = KafkaConsumer('Fact',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumerL = KafkaConsumer('Lifetime',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumerV = KafkaConsumer('Vs',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
     
     print('\nWaiting for AGGREGATED TUPLES, Ctr/Z to stop ...')
-    
-    aggr_tuples = []
-    z = 0
 
-    for message in consumer:
-        in_string = message.value.decode()
-        #print ('\nMesssage Received: {}'.format(in_string))
-        in_split = in_string.split(',')
-            
-        product = in_split[0].strip(' \'')
-        sale = in_split[1].strip(' \'')
-            
-        in_tuple = (product,sale)
-        print ('\nTuple Received: {}'.format(in_tuple))
-        aggr_tuples.append(in_tuple)
+    while True:
+        message = consumer.poll()
+        message = next(iter(message.values()), None)
 
-        z = z + 1
-        
-        if z == 2:
-              break
-        
-    try:  
-        dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
-                                        port=23306, 
-                                        database = 'dw',
-                                        user='deuser',
-                                        password='depassword')
+        if message is not None:
+            in_string = message.value.decode()
+            #print ('\nMesssage Received: {}'.format(in_string))
+            in_split = in_string.split(',')
                 
-        if dw_conn.is_connected():
-            print('\nConnected to destination DW MySQL database')
+            pid = in_split[0].strip(' \'')
+            tid = in_split[1].strip(' \'')
+            opp_tid = in_split[2].strip(' \'')
+            wid = in_split[3].strip(' \'')
+            pts = in_split[4].strip(' \'')
                 
-        dw_cursor = dw_conn.cursor()
-                
-        dw_cursor.executemany(dw_load_query,aggr_tuples)
-                    
-        dw_conn.commit()
-                
-        dw_cursor.execute("SELECT count(*) FROM fact")
-        res = dw_cursor.fetchall()
+            in_tuple = (pid, tid, opp_tid, wid, pts)
+            print ('\nTuple Received: {}'.format(in_tuple))
             
-        print('DW is loaded: {} new tuples are inserted'.format(len(in_tuple)))
-        print('               {} total tuples are inserted'.format(res[0]))    
-                
+            try:  
+                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                                                port=23306, 
+                                                database = 'dw',
+                                                user='deuser',
+                                                password='depassword')
+                        
+                if dw_conn.is_connected():
+                    print('\nConnected to destination DW MySQL database')
+                        
+                dw_cursor = dw_conn.cursor()
+                        
+                dw_cursor.execute(dw_load_fact, in_tuple)
+                            
+                dw_conn.commit()
+                        
+                dw_cursor.execute("SELECT count(*) FROM fact")
+                res = dw_cursor.fetchall()
                     
-    except Error as e:
-        print(e)
+                print('DW is loaded: {} new tuples are inserted'.format(len(in_tuple)))
+                print('               {} total tuples are inserted'.format(res[0]))    
+                        
+                            
+            except Error as e:
+                print(e)
+                        
+            finally:
+                if dw_conn is not None and dw_conn.is_connected():
+                    dw_cursor.close()
+                    dw_conn.close()
+
+############################################################################################
+        messageL = consumerL.poll()
+        messageL = next(iter(messageL.values()), None)
+
+        if messageL is not None:
+            in_string = messageL.value.decode()
+            #print ('\nMesssage Received: {}'.format(in_string))
+            in_split = in_string.split(',')
                 
-    finally:
-        if dw_conn is not None and dw_conn.is_connected():
-            dw_cursor.close()
-            dw_conn.close()    
+            pid = in_split[0].strip(' \'')
+            pts = in_split[1].strip(' \'')
+                
+            in_tuple = (pid, pts)
+            print ('\nTuple Received: {}'.format(in_tuple))
+            
+            try:  
+                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                                                port=23306, 
+                                                database = 'dw',
+                                                user='deuser',
+                                                password='depassword')
+                        
+                if dw_conn.is_connected():
+                    print('\nConnected to destination DW MySQL database')
+                        
+                dw_cursor = dw_conn.cursor()
+                        
+                dw_cursor.execute(dw_load_lifetime, in_tuple)
+                            
+                dw_conn.commit()
+                        
+                dw_cursor.execute("SELECT count(*) FROM fact")
+                res = dw_cursor.fetchall()
+                    
+                print('DW is loaded: {} new tuples are inserted'.format(len(in_tuple)))
+                print('               {} total tuples are inserted'.format(res[0]))    
+                        
+                            
+            except Error as e:
+                print(e)
+                        
+            finally:
+                if dw_conn is not None and dw_conn.is_connected():
+                    dw_cursor.close()
+                    dw_conn.close()
+
+############################################################################################
+        messageV = consumerV.poll()
+        messageV = next(iter(messageV.values()), None)
+
+        if messageV is not None:
+            in_string = messageV.value.decode()
+            #print ('\nMesssage Received: {}'.format(in_string))
+            in_split = in_string.split(',')
+                
+            pid = in_split[0].strip(' \'')
+            opp_tid = in_split[1].strip(' \'')
+            pts = in_split[2].strip(' \'')
+                
+            in_tuple = (pid, opp_tid, pts)
+            print ('\nTuple Received: {}'.format(in_tuple))
+            
+            try:  
+                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                                                port=23306, 
+                                                database = 'dw',
+                                                user='deuser',
+                                                password='depassword')
+                        
+                if dw_conn.is_connected():
+                    print('\nConnected to destination DW MySQL database')
+                        
+                dw_cursor = dw_conn.cursor()
+                        
+                dw_cursor.execute(dw_load_vs, in_tuple)
+                            
+                dw_conn.commit()
+                        
+                dw_cursor.execute("SELECT count(*) FROM fact")
+                res = dw_cursor.fetchall()
+                    
+                print('DW is loaded: {} new tuples are inserted'.format(len(in_tuple)))
+                print('               {} total tuples are inserted'.format(res[0]))    
+                        
+                            
+            except Error as e:
+                print(e)
+                        
+            finally:
+                if dw_conn is not None and dw_conn.is_connected():
+                    dw_cursor.close()
+                    dw_conn.close()
             
 if __name__ == '__main__':
     dw_consumer()
