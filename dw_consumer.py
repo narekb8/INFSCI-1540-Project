@@ -29,9 +29,9 @@ def dw_consumer():
     
     
     
-    consumer = KafkaConsumer('Fact',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerL = KafkaConsumer('Lifetime',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerV = KafkaConsumer('Vs',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumer = KafkaConsumer('Fact',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerL = KafkaConsumer('Lifetime',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerV = KafkaConsumer('Vs',bootstrap_servers=ip+':29092',api_version=(2,0,2))
     
     print('\nWaiting for AGGREGATED TUPLES, Ctr/Z to stop ...')
 
@@ -54,7 +54,7 @@ def dw_consumer():
             print ('\nTuple Received: {}'.format(in_tuple))
             
             try:  
-                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                dw_conn = mysql.connector.connect(host=ip, # !!! make sure you use your VM IP here !!!
                                                 port=23306, 
                                                 database = 'dw',
                                                 user='deuser',
@@ -100,7 +100,7 @@ def dw_consumer():
             print ('\nTuple Received: {}'.format(in_tuple))
             
             try:  
-                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                dw_conn = mysql.connector.connect(host=ip, # !!! make sure you use your VM IP here !!!
                                                 port=23306, 
                                                 database = 'dw',
                                                 user='deuser',
@@ -147,7 +147,7 @@ def dw_consumer():
             print ('\nTuple Received: {}'.format(in_tuple))
             
             try:  
-                dw_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                dw_conn = mysql.connector.connect(host=ip, # !!! make sure you use your VM IP here !!!
                                                 port=23306, 
                                                 database = 'dw',
                                                 user='deuser',
