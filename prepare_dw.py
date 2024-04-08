@@ -15,10 +15,12 @@ def prepare_dw():
     conn = None
     create_db = " CREATE DATABASE dw"
     use_db = "use dw"
-    create_table1 = "CREATE TABLE proddim (prodId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "P_name VARCHAR(20), P_category VARCHAR(20), P_price INT)"
-    create_table2 = "CREATE TABLE fact (factId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "product INT, sale REAL)"        
+    create_table1 = "CREATE TABLE Fact (factid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "pid INT, tid INT, opp_tid INT, wid INT, points REAL)"        
+    create_table2 = "CREATE TABLE Lifetime (ltid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "pid INT, points REAL)"
+    create_table3 = "CREATE TABLE Vs (vsid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "opp_tid INT, points REAL)"
 
     try:  
         conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
@@ -33,6 +35,7 @@ def prepare_dw():
         cursor.execute(use_db)
         cursor.execute(create_table1)
         cursor.execute(create_table2)
+        cursor.execute(create_table3)
         
         conn.commit()
 

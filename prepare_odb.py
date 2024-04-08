@@ -16,12 +16,14 @@ def prepare_odb():
     conn = None
     create_db = " CREATE DATABASE odb"
     use_db = "use odb"
-    create_table2 = "CREATE TABLE Product (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "P_name VARCHAR(20), P_category VARCHAR(20), P_price INT)"
-    create_table3 = "CREATE TABLE Customer (Cid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "C_name VARCHAR(20), C_address VARCHAR(20))"
-    create_table1 = "CREATE TABLE Transaction (Tid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "Cid INT, Pid INT, amount INT, Total_sale REAL)"        
+    create_table1 = "CREATE TABLE Player (pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "name VARCHAR(20), curr_team INT, pos VARCHAR(20))"
+    create_table2 = "CREATE TABLE Team (tid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "name VARCHAR(20), location VARCHAR(20), division VARCHAR(20))"
+    create_table3 = "CREATE TABLE Week (wid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "week_num INT, season_num INT, year INT)"
+    create_table4 = "CREATE TABLE Transaction (trid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "pid INT, tid INT, opp_tid INT, wid INT, points REAL)"        
 
     try:  
         conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
@@ -34,9 +36,10 @@ def prepare_odb():
         cursor = conn.cursor()
         cursor.execute(create_db)
         cursor.execute(use_db)
+        cursor.execute(create_table1)
         cursor.execute(create_table2)
         cursor.execute(create_table3)
-        cursor.execute(create_table1)
+        cursor.execute(create_table4)
         
         conn.commit()
 
