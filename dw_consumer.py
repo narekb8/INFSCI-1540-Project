@@ -10,8 +10,14 @@ Also, make sure you created a mysql user deuser with password depassword and gra
 import mysql.connector
 from mysql.connector import Error
 from kafka import KafkaConsumer
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def dw_consumer():
+    #load db ip
+    ip = os.getenv('IP')
     # Connect to MySQL database
     dw_conn = None
     dw_load_fact = "INSERT INTO fact(pid,tid,opp_tid,wid,points) " \

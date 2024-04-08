@@ -9,8 +9,13 @@ Also, make sure you created a mysql user deuser with password depassword and gra
 
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
 
 def prepare_dw():
+    load_dotenv()
+
+    ip = os.getenv('IP')
     # Connect to MySQL database
     conn = None
     create_db = " CREATE DATABASE dw"
@@ -23,7 +28,7 @@ def prepare_dw():
                      "opp_tid INT, points REAL)"
 
     try:  
-        conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+        conn = mysql.connector.connect(host=ip, # !!! make sure you use your VM IP here !!!
                                   port=23306, 
                                   user='deuser',
                                   password='depassword')

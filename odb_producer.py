@@ -11,8 +11,12 @@ import mysql.connector
 from mysql.connector import Error
 from kafka import KafkaProducer, KafkaConsumer
 from time import sleep
+import os
+from dotenv import load_dotenv
 
 def odb_producer():
+    load_dotenv()
+    ip = os.getenv('IP')
     # Connect to MySQL database
     odb_conn = None
     odb_transaction_query = "SELECT pid, tid, opp_tid, wid, points "\
@@ -45,7 +49,7 @@ def odb_producer():
             sleep(1)
                             
             try:  
-                odb_conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                odb_conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                         port=13306, 
                                         database = 'odb',
                                         user='deuser',

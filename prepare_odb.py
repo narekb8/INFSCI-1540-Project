@@ -10,23 +10,28 @@ Also, make sure you created a mysql user deuser with password depassword and gra
 
 import mysql.connector
 from mysql.connector import Error
+import os
+from dotenv import load_dotenv
 
 def prepare_odb():
+    load_dotenv()
+    ip = os.getenv('IP')
+
     # Connect to MySQL database
     conn = None
     create_db = " CREATE DATABASE odb"
     use_db = "use odb"
-    create_table1 = "CREATE TABLE Player (pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "name VARCHAR(20), curr_team INT, pos VARCHAR(20))"
-    create_table2 = "CREATE TABLE Team (tid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "name VARCHAR(20), location VARCHAR(20), division VARCHAR(20))"
-    create_table3 = "CREATE TABLE Week (wid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "week_num INT, season_num INT, year INT)"
-    create_table4 = "CREATE TABLE Transaction (trid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "pid INT, tid INT, opp_tid INT, wid INT, points REAL)"        
-
+    create_player_table = "CREATE TABLE Player (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "P_name VARCHAR(30), Tid INT, Pos VARCHAR(8))"
+    create_team_table = "CREATE TABLE Team (Cid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "T_name VARCHAR(20), T_abbr VARCHAR(3), T_conf VARCHAR(3), T_div(5))"
+    #ppw = points per week
+    create_table_ppw = "CREATE TABLE PPpW (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "Tid INT, OppTid INT, Wid INT, FScore REAL)"        
+    create_table_week = "CREATE TABLE Week (Wid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                    "Num INT, Season INT, Year INT)"        
     try:  
-        conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+        conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                   port=13306, 
                                   user='deuser',
                                   password='depassword')
@@ -36,16 +41,16 @@ def prepare_odb():
         cursor = conn.cursor()
         cursor.execute(create_db)
         cursor.execute(use_db)
-        cursor.execute(create_table1)
-        cursor.execute(create_table2)
-        cursor.execute(create_table3)
-        cursor.execute(create_table4)
+        cursor.execute(create_player_table)
+        cursor.execute(create_team_table)
+        cursor.execute(create_table_ppw)
+        cursor.execute(create_table_week)
         
         conn.commit()
 
         print('ODB is prepared')
         
-            
+
     except Error as e:
         print(e)
         
@@ -56,4 +61,3 @@ def prepare_odb():
             
 if __name__ == '__main__':
     prepare_odb()
-    

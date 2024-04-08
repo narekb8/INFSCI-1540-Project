@@ -2,6 +2,10 @@
 from kafka import KafkaProducer
 from time import sleep
 import sys
+import os
+from dotenv import load_dotenv
+#doing this so we don't have to keep loading ips
+load_dotenv()
 
 def producer_f(topic,broker_addr):
 
@@ -29,7 +33,8 @@ def producer_f(topic,broker_addr):
     file_src.close()
     print("\nDone with producing data to topic {}.".format(topic))
 
-broker_addr = '10.0.0.42:29092'
+ip = os.getenv('IP')
+broker_addr = ip+':29092'
 
 producer_f(sys.argv[1], broker_addr)
 

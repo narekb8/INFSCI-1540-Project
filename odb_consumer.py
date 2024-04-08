@@ -14,24 +14,30 @@ from mysql.connector import Error
 from kafka import KafkaConsumer, KafkaProducer
 #import json
 from time import sleep
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def odb_consumer():
+    #load db ip
+    ip = os.getenv('IP')
     # Connect to MySQL database
     conn = None
-    queryP = "INSERT INTO Player(teamid,ht,wt) " \
+    queryP = "INSERT INTO Player(P_name,Tid,Pos) " \
             "VALUES(%s,%s,%s)"
-    queryTe = "INSERT INTO Team(name,city) " \
-            "VALUES(%s,%s)"
-    queryW = "INSERT INTO Week(num,season,year) " \
+    queryTe = "INSERT INTO Team(T_name, T_abbr, T_conf, T_div) " \
+            "VALUES(%s,%s, %s, %s)"
+    queryW = "INSERT INTO Week(Num,Season,Year) " \
             "VALUES(%s,%s,%s)"
-    queryT = "INSERT INTO Transaction(pid,tid,opp_tid,wid,points) " \
+    queryT = "INSERT INTO PPpW(Pid,Tid,OppTid,Wid,Fscore) " \
             "VALUES(%s,%s,%s,%s,%s)"
     
-    consumerP = KafkaConsumer('Player',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerTe = KafkaConsumer('Team',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerW = KafkaConsumer('Week',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    consumerT = KafkaConsumer('Transaction',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
-    producer = KafkaProducer(bootstrap_servers='10.0.0.42:29092')
+    consumerP = KafkaConsumer('Player',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerTe = KafkaConsumer('Team',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerW = KafkaConsumer('Week',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerT = KafkaConsumer('Transaction',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    producer = KafkaProducer(bootstrap_servers=ip+':29092')
     
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
     
@@ -52,10 +58,11 @@ def odb_consumer():
             teamid = in_tuple[0]
             ht = in_tuple[1]
             wt = in_tuple[2]
-            tuples.append((teamid,ht,wt))
+            #I'll fix this in the morning
+            tuples.append((T_name, T_abbr, T_conf, T_div))
         
             try:  
-                conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                         port=13306, 
                                         database = 'odb',
                                         user='deuser',
@@ -102,7 +109,7 @@ def odb_consumer():
             tuples.append((num,season,year))
         
             try:  
-                conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                         port=13306, 
                                         database = 'odb',
                                         user='deuser',
@@ -148,7 +155,7 @@ def odb_consumer():
             tuples.append((name,city))
         
             try:  
-                conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                         port=13306, 
                                         database = 'odb',
                                         user='deuser',
@@ -207,7 +214,7 @@ def odb_consumer():
             tuples.append((pid,tid,opp_tid,wid,points))
         
             try:  
-                conn = mysql.connector.connect(host='10.0.0.42', # !!! make sure you use your VM IP here !!!
+                conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                         port=13306, 
                                         database = 'odb',
                                         user='deuser',
