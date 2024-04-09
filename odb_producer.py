@@ -30,8 +30,8 @@ def odb_producer():
                         " GROUP BY pid, opp_tid"
         
                           
-    consumer = KafkaConsumer('fact-update-stream',bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))                      
-    producer = KafkaProducer(bootstrap_servers='10.0.0.42:29092',api_version=(2,0,2))
+    consumer = KafkaConsumer('fact-update-stream',bootstrap_servers=ip+':29092',api_version=(2,0,2))                      
+    producer = KafkaProducer(bootstrap_servers=ip+':29092',api_version=(2,0,2))
           
     print('\nWaiting for ODB UPDATE EVENT, Ctr/Z to stop ...')
     

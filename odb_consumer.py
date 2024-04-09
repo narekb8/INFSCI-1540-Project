@@ -19,6 +19,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 team_ref = {}
+player_def = []
 
 def odb_consumer():
     #load db ip
@@ -39,8 +40,6 @@ def odb_consumer():
     consumerW = KafkaConsumer('Weeks',bootstrap_servers=ip+':29092',api_version=(2,0,2))
     consumerT = KafkaConsumer('PPpW',bootstrap_servers=ip+':29092',api_version=(2,0,2))
     producer = KafkaProducer(bootstrap_servers=ip+':29092')
-
-    consumerP.subscribe('Players')
     
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
     
@@ -71,6 +70,7 @@ def odb_consumer():
                 Tid = team_ref.get(in_tuple[2])
                 Pos = in_tuple[1]
                 tuples.append((P_name,Tid,Pos))
+                player_def.append(in_tuple)
 
                 for tuple in tuples:
                     cursor.execute(queryP,tuple)
@@ -202,7 +202,7 @@ def odb_consumer():
             
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
-            pid = in_tuple[0]
+            pid = player_def.index(in_tuple[0])
             tid = team_ref.get(in_tuple[2])
             for i in range(1,72):
                 opp_tid = team_ref.get(in_tuple[2*i + 2])
