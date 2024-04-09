@@ -65,5 +65,5 @@ y2020, totalweeks, weeks = add_season(y2020, "project_datasets/FantasyPros_Fanta
 y2020, totalweeks,weeks = add_season(y2020, "project_datasets/FantasyPros_Fantasy_Football_Points_QB_2023.csv", totalweeks, weeks, 2023)
 y2020 = add_opp_cols(y2020)
 y2020 = fill_op_cols(y2020)
-y2020.to_csv("PPpW.csv", index=True)
+y2020.to_csv("project_datasets/PPpW.csv", index=True)
 weeks.to_csv("project_datasets/Weeks.csv", index=False)
