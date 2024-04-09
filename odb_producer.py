@@ -19,15 +19,15 @@ def odb_producer():
     ip = os.getenv('IP')
     # Connect to MySQL database
     odb_conn = None
-    odb_transaction_query = "SELECT pid, tid, opp_tid, wid, points "\
-                          " FROM Transaction "\
-                          " GROUP BY Pid"
+    odb_transaction_query = "SELECT pid, tid, opptid, wid, points "\
+                          " FROM PPpW "\
+                          " GROUP BY Pid, tid, opptid, wid, points"
     odb_lifetime_query = "SELECT pid, sum(points) "\
-                        " FROM Transaction "\
+                        " FROM PPpW "\
                         " GROUP BY pid"
-    odb_vs_query = "SELECT pid, opp_tid, sum(points) "\
-                        " FROM Transaction "\
-                        " GROUP BY pid, opp_tid"
+    odb_vs_query = "SELECT pid, opptid, sum(points) "\
+                        " FROM PPpW "\
+                        " GROUP BY pid, opptid"
         
                           
     consumer = KafkaConsumer('fact-update-stream',bootstrap_servers=ip+':29092',api_version=(2,0,2))                      

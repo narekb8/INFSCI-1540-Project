@@ -196,6 +196,9 @@ def odb_consumer():
             
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
+            in_tuple[:] = [x if x != '' else None for x in in_tuple]
+            in_tuple[:] = [x if x != '-' else None for x in in_tuple]
+
             pid = player_def.index(in_tuple[0])
             tid = team_ref.get(in_tuple[2])
             for i in range(1,72):

@@ -20,7 +20,7 @@ def dw_consumer():
     ip = os.getenv('IP')
     # Connect to MySQL database
     dw_conn = None
-    dw_load_fact = "INSERT INTO fact(pid,tid,opp_tid,wid,points) " \
+    dw_load_fact = "INSERT INTO Fact(pid,tid,opp_tid,wid,points) " \
                      "VALUES(%s,%s,%s,%s,%s)"
     dw_load_lifetime = "INSERT INTO Lifetime(pid,points) " \
                      "VALUES(%s,%s)"

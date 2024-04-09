@@ -35,11 +35,12 @@ producer = KafkaProducer(bootstrap_servers=broker_addr,api_version=(2,0,2))
 
 producer_f('Teams', broker_addr)
 sleep(5)
-#producer_f('Weeks', broker_addr)
-#sleep(5)
+producer_f('Weeks', broker_addr)
+sleep(5)
 producer_f('Players', broker_addr)
 sleep(5)
 producer_f('PPpW', broker_addr)
+producer.send('PPpW', 'data stream done'.encode())
 
 while True:
     sleep(1)
