@@ -22,9 +22,9 @@ def prepare_odb():
     create_db = " CREATE DATABASE odb"
     use_db = "use odb"
     create_player_table = "CREATE TABLE Player (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "P_name VARCHAR(30), Tid INT, Pos VARCHAR(8))"
-    create_team_table = "CREATE TABLE Team (Cid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "T_name VARCHAR(20), T_abbr VARCHAR(3), T_conf VARCHAR(3), T_div(5))"
+                     "P_name VARCHAR(35), Tid INT, Pos VARCHAR(8))"
+    create_team_table = "CREATE TABLE Team (Tid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "T_name VARCHAR(30), T_abbr VARCHAR(3), T_conf VARCHAR(3), T_div VARCHAR(5))"
     #ppw = points per week
     create_table_ppw = "CREATE TABLE PPpW (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
                      "Tid INT, OppTid INT, Wid INT, FScore REAL)"        

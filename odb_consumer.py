@@ -33,11 +33,13 @@ def odb_consumer():
     queryT = "INSERT INTO PPpW(Pid,Tid,OppTid,Wid,Fscore) " \
             "VALUES(%s,%s,%s,%s,%s)"
     
-    consumerP = KafkaConsumer('Player',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerTe = KafkaConsumer('Team',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerW = KafkaConsumer('Week',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerT = KafkaConsumer('Transaction',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerP = KafkaConsumer('Players',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerTe = KafkaConsumer('Teams',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerW = KafkaConsumer('Weeks',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerT = KafkaConsumer('PPpW',bootstrap_servers=ip+':29092',api_version=(2,0,2))
     producer = KafkaProducer(bootstrap_servers=ip+':29092')
+
+    consumerP.subscribe('Players')
     
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
     
@@ -54,12 +56,6 @@ def odb_consumer():
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
             sleep(1)
-            
-            teamid = in_tuple[0]
-            ht = in_tuple[1]
-            wt = in_tuple[2]
-            #I'll fix this in the morning
-            tuples.append((T_name, T_abbr, T_conf, T_div))
         
             try:  
                 conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
@@ -72,6 +68,13 @@ def odb_consumer():
                 
                 cursor = conn.cursor()
                 
+                P_name = in_tuple[0]
+                cursor.execute('SELECT Tid FROM Team WHERE T_abbr = %s', (in_tuple[1]))
+                Tid = cursor.fetchall()[0]
+                Pos = in_tuple[2]
+                #I'll fix this in the morning
+                tuples.append((P_name,Tid,Pos))
+
                 for tuple in tuples:
                     cursor.execute(queryP,tuple)
                     
@@ -150,9 +153,11 @@ def odb_consumer():
             
             sleep(1)
             
-            name = in_tuple[0]
-            city = in_tuple[1]
-            tuples.append((name,city))
+            T_name = in_tuple[1]
+            T_abbr = in_tuple[2]
+            T_conf = in_tuple[3]
+            T_div = in_tuple[4]
+            tuples.append((T_name, T_abbr, T_conf, T_div))
         
             try:  
                 conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
