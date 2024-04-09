@@ -9,8 +9,6 @@ import csv
 load_dotenv()
 
 def producer_f(topic,broker_addr):
-
-    producer = KafkaProducer(bootstrap_servers=broker_addr,api_version=(2,0,2))
     
     filename = "project_datasets/"+topic+".csv"
     # file_src = open(filename,"r")
@@ -26,15 +24,19 @@ def producer_f(topic,broker_addr):
             producer.send(topic,line.encode())
             count += 1
             print("\nProduced input tuple {}: {}".format(count-1, line))
+            sleep(2)
 
-    sleep(2)
     print("\nDone with producing data to topic {}.".format(topic))
 
 ip = os.getenv('IP')
 broker_addr = ip+':29092'
+
+producer = KafkaProducer(bootstrap_servers=broker_addr,api_version=(2,0,2))
 
 producer_f('Teams', broker_addr)
 producer_f('PPpW', broker_addr)
 producer_f('Weeks', broker_addr)
 producer_f('Players', broker_addr)
 
+while True:
+    sleep(1)

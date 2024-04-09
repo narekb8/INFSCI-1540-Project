@@ -29,7 +29,7 @@ def prepare_odb():
     create_table_ppw = "CREATE TABLE PPpW (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
                      "Tid INT, OppTid INT, Wid INT, FScore REAL)"        
     create_table_week = "CREATE TABLE Week (Wid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                    "Num INT, Season INT, Year INT)"        
+                    "Num INT, Season INT)"        
     try:  
         conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
                                   port=13306, 

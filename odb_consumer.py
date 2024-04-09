@@ -18,6 +18,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+team_ref = {}
 
 def odb_consumer():
     #load db ip
@@ -28,8 +29,8 @@ def odb_consumer():
             "VALUES(%s,%s,%s)"
     queryTe = "INSERT INTO Team(T_name, T_abbr, T_conf, T_div) " \
             "VALUES(%s,%s, %s, %s)"
-    queryW = "INSERT INTO Week(Num,Season,Year) " \
-            "VALUES(%s,%s,%s)"
+    queryW = "INSERT INTO Week(Num,Season) " \
+            "VALUES(%s,%s)"
     queryT = "INSERT INTO PPpW(Pid,Tid,OppTid,Wid,Fscore) " \
             "VALUES(%s,%s,%s,%s,%s)"
     
@@ -54,8 +55,6 @@ def odb_consumer():
             in_string = messageP.value.decode()
             in_tuple = in_string.strip('"').split(',')
             print ('\nInput Tuple Received: {}'.format(in_tuple))
-            
-            sleep(1)
         
             try:  
                 conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
@@ -69,10 +68,8 @@ def odb_consumer():
                 cursor = conn.cursor()
                 
                 P_name = in_tuple[0]
-                cursor.execute('SELECT Tid FROM Team WHERE T_abbr = %s', (in_tuple[1]))
-                Tid = cursor.fetchall()[0]
-                Pos = in_tuple[2]
-                #I'll fix this in the morning
+                Tid = team_ref.get(in_tuple[2])
+                Pos = in_tuple[1]
                 tuples.append((P_name,Tid,Pos))
 
                 for tuple in tuples:
@@ -104,12 +101,9 @@ def odb_consumer():
             in_tuple = in_string.strip('"').split(',')
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
-            sleep(1)
-            
-            num = in_tuple[0]
-            season = in_tuple[1]
-            year = in_tuple[2]
-            tuples.append((num,season,year))
+            num = in_tuple[1]
+            season = in_tuple[2]
+            tuples.append((num,season))
         
             try:  
                 conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
@@ -151,8 +145,7 @@ def odb_consumer():
             in_tuple = in_string.strip('"').split(',')
             print ('\nInput Tuple Received: {}'.format(in_tuple))
             
-            sleep(1)
-            
+            team_ref[in_tuple[2]] = in_tuple[0]
             T_name = in_tuple[1]
             T_abbr = in_tuple[2]
             T_conf = in_tuple[3]
@@ -208,14 +201,13 @@ def odb_consumer():
                  continue
             
             print ('\nInput Tuple Received: {}'.format(in_tuple))
-
-            sleep(1)
             
             pid = in_tuple[0]
-            tid = in_tuple[1]
-            opp_tid = in_tuple[2]
-            wid = in_tuple[3]
-            points = in_tuple[4]
+            tid = team_ref.get(in_tuple[2])
+            for i in range(1,72):
+                opp_tid = team_ref.get(in_tuple[2*i + 2])
+                wid = i
+                points = in_tuple[2*i + 1]
             tuples.append((pid,tid,opp_tid,wid,points))
         
             try:  
