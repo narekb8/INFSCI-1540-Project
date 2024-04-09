@@ -19,13 +19,13 @@ def odb_producer():
     ip = os.getenv('IP')
     # Connect to MySQL database
     odb_conn = None
-    odb_transaction_query = "SELECT pid, tid, opptid, wid, points "\
+    odb_transaction_query = "SELECT pid, tid, opptid, wid, fscore "\
                           " FROM PPpW "\
-                          " GROUP BY Pid, tid, opptid, wid, points"
-    odb_lifetime_query = "SELECT pid, sum(points) "\
+                          " GROUP BY Pid, tid, opptid, wid, fscore"
+    odb_lifetime_query = "SELECT pid, sum(fscore) "\
                         " FROM PPpW "\
                         " GROUP BY pid"
-    odb_vs_query = "SELECT pid, opptid, sum(points) "\
+    odb_vs_query = "SELECT pid, opptid, sum(fscore) "\
                         " FROM PPpW "\
                         " GROUP BY pid, opptid"
         

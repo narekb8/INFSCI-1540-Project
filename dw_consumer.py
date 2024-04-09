@@ -41,14 +41,22 @@ def dw_consumer():
 
         if message is not None:
             in_string = message.value.decode()
+            in_string = in_string[0]
             #print ('\nMesssage Received: {}'.format(in_string))
             in_split = in_string.split(',')
                 
             pid = in_split[0].strip(' \'')
             tid = in_split[1].strip(' \'')
+            if tid == 'None':
+                tid = None
             opp_tid = in_split[2].strip(' \'')
+            if opp_tid == 'None':
+                opp_tid = None
             wid = in_split[3].strip(' \'')
             pts = in_split[4].strip(' \'')
+            if pts == 'None':
+                pts = None
+
                 
             in_tuple = (pid, tid, opp_tid, wid, pts)
             print ('\nTuple Received: {}'.format(in_tuple))
