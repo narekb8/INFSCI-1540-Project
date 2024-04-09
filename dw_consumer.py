@@ -40,8 +40,8 @@ def dw_consumer():
         message = next(iter(message.values()), None)
 
         if message is not None:
+            message = message[0]
             in_string = message.value.decode()
-            in_string = in_string[0]
             #print ('\nMesssage Received: {}'.format(in_string))
             in_split = in_string.split(',')
                 
@@ -77,7 +77,7 @@ def dw_consumer():
                             
                 dw_conn.commit()
                         
-                dw_cursor.execute("SELECT count(*) FROM fact")
+                dw_cursor.execute("SELECT count(*) FROM Fact")
                 res = dw_cursor.fetchall()
                     
                 print('DW is loaded: {} new tuples are inserted'.format(len(in_tuple)))
