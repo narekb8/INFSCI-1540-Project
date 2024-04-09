@@ -1,5 +1,8 @@
 # INFSCI 1540 Project Report - American Football Quarterbacks
 
+### What is this?
+Our project provides a database of quarterback performances per game so answer questions such as: Who is the highest performing quarterback in N seasons? Which QB is the best performing average? Do I draft CJ Stroud?
+
 ### What data are we maintaining in our system?
 Our data engineering system maintains a list of NFL quarterbacks over the last 4 years, their **current** teams, the games they played in, and their standard fantasy football score each game.(.04*passings yard + .1*rushing yards + 4*passing touchdowns+.6*rushing touchdowns - 2*fumbles)
 
