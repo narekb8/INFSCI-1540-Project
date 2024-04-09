@@ -6,6 +6,7 @@ import numpy as np
 def add_season(df, csv, tw, wdf, snum):
     df2 = pd.read_csv(csv)
     df2 = df2.drop('#',axis=1)
+    df2 = df2.iloc[:,:-2]
     nw = 0
     for col in df2.columns:
         try:
@@ -49,6 +50,7 @@ def fill_op_cols(df: pd.DataFrame):
 
 y2020 = pd.read_csv("project_datasets/FantasyPros_Fantasy_Football_Points_QB_2020.csv")
 y2020 = y2020.drop('#',axis=1)
+y2020 = y2020.iloc[:,:-2]
 weeks = pd.read_csv("project_datasets/Weeks.csv")
 #remove - & byes
 for col_index in range(3,19):
