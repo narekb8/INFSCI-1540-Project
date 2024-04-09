@@ -10,6 +10,7 @@ def add_season(df, csv, tw, wdf, snum):
     for col in df2.columns:
         try:
             oc = int(col)
+            df2[col] = pd.to_numeric(df2[col], errors='coerce').fillna('')
             nw +=1
             newcol = oc+tw
             df2 = df2.rename(columns={col:newcol})
@@ -38,7 +39,11 @@ def add_opp_cols(df):
 y2020 = pd.read_csv("project_datasets/FantasyPros_Fantasy_Football_Points_QB_2020.csv")
 y2020 = y2020.drop('#',axis=1)
 weeks = pd.read_csv("project_datasets/Weeks.csv")
-
+#remove - & byes
+for col_index in range(3,19):
+    column_name = y2020.columns[col_index]
+    print(column_name)
+    y2020[column_name] = pd.to_numeric(y2020[column_name], errors='coerce').fillna('')
 totalweeks = 17
 #games per season
 gps = [17]
@@ -46,5 +51,5 @@ y2020, totalweeks, weeks= add_season(y2020, "project_datasets/FantasyPros_Fantas
 y2020, totalweeks, weeks = add_season(y2020, "project_datasets/FantasyPros_Fantasy_Football_Points_QB_2022.csv", totalweeks, weeks, 2022)
 y2020, totalweeks,weeks = add_season(y2020, "project_datasets/FantasyPros_Fantasy_Football_Points_QB_2023.csv", totalweeks, weeks, 2023)
 y2020 = add_opp_cols(y2020)
-y2020.to_csv("PPpW.csv", index=True)
+y2020.to_csv("PPpW.csv", index=False)
 weeks.to_csv("project_datasets/Weeks.csv", index=False)
