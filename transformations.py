@@ -24,7 +24,7 @@ def add_season(df, csv, tw, wdf, snum):
     print(wdf.head(25))
     return df, tw+nw, wdf
 
-#gonna have to fill by hand
+
 def add_opp_cols(df):
     for col in df.columns:
         try:
@@ -35,6 +35,17 @@ def add_opp_cols(df):
             print("Valueerror"+col)
             continue
     return df
+
+#this is where things get ugly
+def fill_op_cols(df: pd.DataFrame):
+    cols_to_load = ['season', 'game_week', 'name_display', 'opp_abb']
+    mf = pd.read_csv("project_datasets/qbr_week_level_2020.csv", usecols=cols_to_load)
+    df.set_index('Player', inplace=True)
+    for _, row in mf.iterrows():
+        row['game_week'] = (int(row['season'])%10*18)+row['game_week']
+        df.loc[row['name_display'], 'week_'+str(row['game_week'])+'_opp'] = row['opp_abb']
+    return df
+
 
 y2020 = pd.read_csv("project_datasets/FantasyPros_Fantasy_Football_Points_QB_2020.csv")
 y2020 = y2020.drop('#',axis=1)
@@ -51,5 +62,6 @@ y2020, totalweeks, weeks= add_season(y2020, "project_datasets/FantasyPros_Fantas
 y2020, totalweeks, weeks = add_season(y2020, "project_datasets/FantasyPros_Fantasy_Football_Points_QB_2022.csv", totalweeks, weeks, 2022)
 y2020, totalweeks,weeks = add_season(y2020, "project_datasets/FantasyPros_Fantasy_Football_Points_QB_2023.csv", totalweeks, weeks, 2023)
 y2020 = add_opp_cols(y2020)
-y2020.to_csv("PPpW.csv", index=False)
+y2020 = fill_op_cols(y2020)
+y2020.to_csv("PPpW.csv", index=True)
 weeks.to_csv("project_datasets/Weeks.csv", index=False)
