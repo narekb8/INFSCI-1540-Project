@@ -13,3 +13,42 @@ We seperated games by weeks because its how NFL seasons are split and organized 
 5. DW Phpmyadmin Server - Allows us to interact with the DW sql server
 6. Kafka Broker - Allows our producers and consumers to interact with each other
 7. Zookeeper - Keeps track of our current broker and tells producers and consumers to go through our broker
+
+### Star Diagram
+```mermaid
+---
+title: Star Chart
+---
+erDiagram
+  PLAYER }|--|| FACT: Dimension
+  PLAYER {
+    int TeamId
+    string Name
+    string Pos
+  }
+  PPpW }|--|| FACT: Dimension
+  PPpW {
+    int PlayerID
+    int TeamID
+    int WeekID
+    double fScore
+  }
+  FACT {
+    int PlayerID
+    int TeamID
+    int WeekID
+    double Score
+  }
+  TEAM }|--|| FACT: Dimension
+  TEAM {
+    string Name
+    string Abreviation
+    string Conference
+    string Division
+  }
+  WEEK }|--|| FACT: Dimension
+  WEEK {
+    int WeekNumber
+    int Season
+  }
+  
