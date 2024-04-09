@@ -26,8 +26,8 @@ def prepare_odb():
     create_team_table = "CREATE TABLE Team (Tid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
                      "T_name VARCHAR(30), T_abbr VARCHAR(3), T_conf VARCHAR(3), T_div VARCHAR(5))"
     #ppw = points per week
-    create_table_ppw = "CREATE TABLE PPpW (Pid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
-                     "Tid INT, OppTid INT, Wid INT, FScore REAL)"        
+    create_table_ppw = "CREATE TABLE PPpW (Pwid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
+                     "Pid INT, Tid INT, OppTid INT, Wid INT, FScore REAL)"        
     create_table_week = "CREATE TABLE Week (Wid INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " \
                     "Num INT, Season INT)"        
     try:  

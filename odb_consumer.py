@@ -70,7 +70,7 @@ def odb_consumer():
                 Tid = team_ref.get(in_tuple[2])
                 Pos = in_tuple[1]
                 tuples.append((P_name,Tid,Pos))
-                player_def.append(in_tuple)
+                player_def.append(in_tuple[0])
 
                 for tuple in tuples:
                     cursor.execute(queryP,tuple)
@@ -79,8 +79,6 @@ def odb_consumer():
                 
                 cursor.execute("SELECT count(*) FROM Player")
                 print(cursor.fetchall())
-                
-                sleep(2)
                     
             except Error as e:
                 print(e)
@@ -123,8 +121,6 @@ def odb_consumer():
                 
                 cursor.execute("SELECT count(*) FROM Week")
                 print(cursor.fetchall())
-                
-                sleep(2)
                     
             except Error as e:
                 print(e)
@@ -170,8 +166,6 @@ def odb_consumer():
                 
                 cursor.execute("SELECT count(*) FROM Team")
                 print(cursor.fetchall())
-                
-                sleep(2)
                     
             except Error as e:
                 print(e)
@@ -208,7 +202,7 @@ def odb_consumer():
                 opp_tid = team_ref.get(in_tuple[2*i + 2])
                 wid = i
                 points = in_tuple[2*i + 1]
-            tuples.append((pid,tid,opp_tid,wid,points))
+                tuples.append((pid,tid,opp_tid,wid,points))
         
             try:  
                 conn = mysql.connector.connect(host=ip+'', # !!! make sure you use your VM IP here !!!
@@ -221,15 +215,12 @@ def odb_consumer():
                 
                 cursor = conn.cursor()
                 
-                for tuple in tuples:
-                    cursor.execute(queryT,tuple)
+                cursor.executemany(queryT,tuples)
                     
                 conn.commit()
                 
-                cursor.execute("SELECT count(*) FROM Transaction")
+                cursor.execute("SELECT count(*) FROM PPpW")
                 print(cursor.fetchall())
-                
-                sleep(2)
 
                 m = 'odb update event'   
                 producer.send('fact-update-stream', m.encode())
