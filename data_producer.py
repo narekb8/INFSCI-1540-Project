@@ -10,6 +10,8 @@ load_dotenv()
 
 def producer_f(topic,broker_addr):
     
+    producer = KafkaProducer(bootstrap_servers=broker_addr,api_version=(2,0,2))
+
     filename = "project_datasets/"+topic+".csv"
     # file_src = open(filename,"r")
     count = 0
@@ -40,7 +42,7 @@ sleep(5)
 producer_f('Players', broker_addr)
 sleep(5)
 producer_f('PPpW', broker_addr)
-producer.send('PPpW', 'data stream done'.encode())
+#producer.send('PPpW', 'data stream done'.encode())
 
 while True:
     sleep(1)

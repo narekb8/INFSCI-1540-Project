@@ -1,0 +1,3 @@
+SELECT * FROM `PPpW` WHERE FScore > 30;
+
+SELECT * FROM `PPpW` WHERE Pid = 20;
