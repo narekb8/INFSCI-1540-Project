@@ -35,10 +35,10 @@ def odb_consumer():
     queryT = "INSERT INTO PPpW(Pid,Tid,OppTid,Wid,Fscore) " \
             "VALUES(%s,%s,%s,%s,%s)"
     
-    consumerP = KafkaConsumer('Players',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerTe = KafkaConsumer('Teams',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerW = KafkaConsumer('Weeks',bootstrap_servers=ip+':29092',api_version=(2,0,2))
-    consumerT = KafkaConsumer('PPpW',bootstrap_servers=ip+':29092',api_version=(2,0,2))
+    consumerP = KafkaConsumer('Players',bootstrap_servers=ip+':29092',api_version=(2,0,2),max_in_flight_requests_per_connection=1000)
+    consumerTe = KafkaConsumer('Teams',bootstrap_servers=ip+':29092',api_version=(2,0,2),max_in_flight_requests_per_connection=1000)
+    consumerW = KafkaConsumer('Weeks',bootstrap_servers=ip+':29092',api_version=(2,0,2),max_in_flight_requests_per_connection=1000)
+    consumerT = KafkaConsumer('PPpW',bootstrap_servers=ip+':29092',api_version=(2,0,2),max_in_flight_requests_per_connection=1000)
     producer = KafkaProducer(bootstrap_servers=ip+':29092')
     
     print('\nWaiting for INPUT TUPLES, Ctr/Z to stop ...')
@@ -184,8 +184,8 @@ def odb_consumer():
             messageT = messageT[0]
             in_string = messageT.value.decode()
 
-            if 'data stream done' in in_string:
-                m = 'odb update complete'   
+            if 'data-stream-done' in in_string:
+                m = 'odb-update-complete'   
                 producer.send('fact-update-stream', m.encode())
                 print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
                 producer.flush()
@@ -195,11 +195,14 @@ def odb_consumer():
                  continue
             
             print ('\nInput Tuple Received: {}'.format(in_tuple))
+
+            in_tuple[:] = [x if x != '' else None for x in in_tuple]
+            in_tuple[:] = [x if x != '-' else None for x in in_tuple]
             
             in_tuple[:] = [x if x != '' else None for x in in_tuple]
             in_tuple[:] = [x if x != '-' else None for x in in_tuple]
 
-            pid = player_def.index(in_tuple[0])
+            pid = player_def.index(in_tuple[0]) + 1
             tid = team_ref.get(in_tuple[2])
             for i in range(1,72):
                 opp_tid = team_ref.get(in_tuple[2*i + 2])
@@ -224,11 +227,6 @@ def odb_consumer():
                 
                 cursor.execute("SELECT count(*) FROM PPpW")
                 print(cursor.fetchall())
-
-                m = 'odb update event'   
-                producer.send('fact-update-stream', m.encode())
-                print('\nODB UPDATE EVENT SENT TO ODB UPDATE STREAM')
-                producer.flush()
                     
             except Error as e:
                 print(e)
