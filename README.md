@@ -22,9 +22,6 @@ Our data loading process involved organizing our data to be used. Each player an
 
 ### Star Diagram
 ```mermaid
----
-title: Star Chart
----
 erDiagram
   PLAYER }|--|| PPpW: Dimension
   PLAYER {
@@ -78,6 +75,20 @@ The data stream supported in our system was Kafka. We used it to move our data f
 Our main summary table is the **FACT** table. We took the data through our normalized csv then PPpW table and mirrored it to create our fact table. We also made a summary table for the total points each player earned in their **Lifetime** and the total points have been scored against each team in the past 4 seasons called **Vs**.
 
 ### OLAP Queries
-You can find them in the `queries.sql` file and corresponding screenshots in the `screenshots` folder.
+Player with the most 40-point games:
+
+![Alt text](/screenshots/40pointcount.png?raw=true "Most 40-point games")
+
+Every 40-point game:
+
+![Alt text](/screenshots/all40s.png?raw=true "All 40-point games")
+
+Dak Prescott's Lifetime Performance:
+
+![Alt text](/screenshots/DakPrescottLTPoints.png?raw=true "Dak Prescott Lifetime")
+
+Strongest Defensive Team:
+
+![Alt text](/screenshots/40pointcount.png?raw=true "Strongest Defense")
 
 #### Thanks for reading! Feel free to demo on your own time!
