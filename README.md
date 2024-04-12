@@ -26,13 +26,12 @@ Our data loading process involved organizing our data to be used. Each player an
 title: Star Chart
 ---
 erDiagram
-  PLAYER }|--|| FACT: Dimension
+  PLAYER }|--|| PPpW: Dimension
   PLAYER {
     int TeamId
     string Name
     string Pos
   }
-  PPpW }|--|| FACT: Dimension
   PPpW {
     int PlayerID
     int TeamID
@@ -47,17 +46,28 @@ erDiagram
     int WeekID
     double Score
   }
-  TEAM }|--|| FACT: Dimension
+  TEAM }|--|| PPpW: Dimension
   TEAM {
     string Name
     string Abreviation
     string Conference
     string Division
   }
-  WEEK }|--|| FACT: Dimension
+  WEEK }|--|| PPpW: Dimension
   WEEK {
     int WeekNumber
     int Season
+  }
+  PPpW}|--|| Lifetime: ODB-to-DW_Aggregate
+  Lifetime {
+    int PlayerID
+    double Score
+  }
+  PPpW }|--|{ FACT: ODB-to-DW
+  PPpW}|--|| Vs: ODB-to-DW_Aggregate
+  Vs {
+    int OppTeamID
+    double Score
   }
 ```
 
