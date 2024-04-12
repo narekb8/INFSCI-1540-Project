@@ -36,12 +36,14 @@ erDiagram
   PPpW {
     int PlayerID
     int TeamID
+    int OppTeamID
     int WeekID
     double fScore
   }
   FACT {
     int PlayerID
     int TeamID
+    int OppTeamID
     int WeekID
     double Score
   }
