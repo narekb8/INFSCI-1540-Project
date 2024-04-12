@@ -17,6 +17,9 @@ We seperated games by weeks because its how NFL seasons are split and organized 
 6. Kafka Broker - Allows our producers and consumers to interact with each other
 7. Zookeeper - Keeps track of our current broker and tells producers and consumers to go through our broker
 
+### The data loading process
+Our data loading process involved organizing our data to be used. Each player and team was given a table. Each week in the past 4 seasons was given its own id. We then normalized these into one table that held each player's NAME TEAM and PLAYER PERFORMANCE(fantasy score) for EACH WEEK in the past four seasons and cross referenced this against a different dataset to find which teams the player played against. Then, using kafka, we uploaded the tables to the ODB and created a new table which gave each game that was played by someone its own row. Our data warehouse would then mirror our performance per week dataset.
+
 ### Star Diagram
 ```mermaid
 ---
@@ -54,4 +57,15 @@ erDiagram
     int WeekNumber
     int Season
   }
-  
+```
+
+### Data Streaming
+The data stream supported in our system was Kafka. We used it to move our data from CSVs to our ODB and our summary table to our DW.
+
+### Pre-Aggregated Summary table
+Our main summary table is the **FACT** table. We took the data through our normalized csv then PPpW table and mirrored it to create our fact table. We also made a summary table for the total points each player earned in their **Lifetime** and the total points have been scored against each team in the past 4 seasons called **Vs**.
+
+### OLAP Queries
+You can find them in the `queries.sql` file and corresponding screenshots in the `screenshots` folder.
+
+#### Thanks for reading! Feel free to demo on your own time!
