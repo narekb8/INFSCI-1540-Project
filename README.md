@@ -8,8 +8,10 @@ Our data engineering system maintains a list of NFL quarterbacks over the last 4
 
 We seperated games by weeks because its how NFL seasons are split and organized the weeks of the 2020-2023 seasons into 1 table so the weeks do not overlap.
 
+Importantly, we left in a lot of "empty" data, as it in itself is it's own statistic. Using this data we can find statistics on how often players were actually played in a series, and for more specific averages per weeks/matches played.
+
 ### Our docker containers
-1. Php Web Server - Gotta double check what this is for
+1. Php Web Server - General DB Management
 2. Mysql ODB Server - Our operational database to store our tables
 3. Mysql DW Server - Our data warehouse holding onto our fact table and player performance information
 4. ODB Phpmyadmin Server - Allows us to interact with the ODB sql server
